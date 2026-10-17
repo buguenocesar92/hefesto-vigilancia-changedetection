@@ -1,0 +1,35 @@
+name: hefesto-vigilancia
+services:
+  app:
+    image: dgtlmoon/changedetection.io:0.60.9@sha256:04eaae7915bad711160cb15abe160f6d3fabe98bbbd658509d4b7a654000fb2d
+    command: [python, /opt/hefesto/start.py]
+    restart: unless-stopped
+    stop_grace_period: 90s
+    environment:
+      TZ: America/Santiago
+      BASE_URL: ${PUBLIC_URL:?Configurar URL}
+      SALTED_PASS: ${SALTED_PASS:?Generar hash}
+      FETCH_WORKERS: "2"
+      MINIMUM_SECONDS_RECHECK_TIME: "3600"
+      PAGE_WATCH_LIMIT: "50"
+      DEFAULT_FETCH_BACKEND: html_requests
+      ALLOW_IANA_RESTRICTED_ADDRESSES: "false"
+      ALLOW_FILE_URI: "false"
+      DISABLE_VERSION_CHECK: "true"
+      HIDE_REFERER: "true"
+    expose: ["5000"]
+    volumes: [data:/datastore, ./ops:/opt/hefesto:ro]
+  filetools:
+    image: alpine:3.22
+    profiles: [tools]
+    user: "0"
+    volumes: [data:/files]
+  permissions:
+    image: alpine:3.22
+    profiles: [tools]
+    user: "0"
+    entrypoint: [sh, -ec, 'chown -R 0:0 /files; chmod 700 /files']
+    volumes: [data:/files]
+volumes:
+  data:
+    name: ${VOLUME_PREFIX:-hefesto-vigilancia}-data

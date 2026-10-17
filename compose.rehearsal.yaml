@@ -1,0 +1,4 @@
+# Blocks internet during recovery; do not attach proxy or external networks.
+networks:
+  default:
+    internal: true

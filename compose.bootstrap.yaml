@@ -1,0 +1,5 @@
+services:
+  app:
+    environment:
+      BASE_URL: http://localhost:8108
+    ports: ["127.0.0.1:8108:5000"]
